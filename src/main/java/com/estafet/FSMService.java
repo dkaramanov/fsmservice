@@ -39,6 +39,8 @@ public class FSMService {
 		String currentPath = currentRelativePath.toAbsolutePath().toString();
 		String result = shell.executeCommand("sh ./src/main/resources/bin/abc.sh");
 		
+		result = result.replaceAll("\n", "<br/>");
+		
 		StringBuffer stringBuffer = new StringBuffer();
 		stringBuffer.append("<h1>FSM Demo project</h1>");
 		stringBuffer.append("<br/>");
