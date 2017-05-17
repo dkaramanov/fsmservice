@@ -26,7 +26,7 @@ public class FSMService {
 	private FSM f;
 	private String myrole = "generic";
 	private final static String SCRIBBLEDIR = "/opt/app-root/src/src/main/resources"; 
-	private String location = SCRIBBLEDIR;// + "/src/main/resources";
+	private String location = SCRIBBLEDIR;
 	static String urlString = "/fsmserver/api";
 	static String payload = urlString + " response.";
 
@@ -37,7 +37,7 @@ public class FSMService {
 		String s = currentRelativePath.toAbsolutePath().toString();
 		Shell shell = new Shell();
 		String result = shell.executeCommand("sh ./src/main/resources/bin/abc.sh");
-		return "<h1>Hello World of the GET ::: " + s + "</h1>" + "<br/>" + result;
+		return "<h1>FSM Demo project" + s + "</h1>" + "<br/>" + "Your current dir is " + result;
 	}
 
 	@POST
