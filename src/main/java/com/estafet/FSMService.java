@@ -153,11 +153,10 @@ public class FSMService {
 
 		System.out.println("command <" + command + ">");
 
-		Shell sh = new Shell();
-		String output = sh.executeCommand(command);
+		String output = shell.executeCommand(command);
 
 		System.out.println("***\n" + output + "\n***");
-		output = sh.executeCommand("ls -ls " + location + "/bin/generated");
+		output = shell.executeCommand("ls -ls " + location + "/bin/generated");
 		System.out.println("***\n" + output + "\n***");
 
 		return location + "/bin/generated" + role + "_config.txt";
