@@ -29,15 +29,25 @@ public class FSMService {
 	private String location = SCRIBBLEDIR;
 	static String urlString = "/fsmserver/api";
 	static String payload = urlString + " response.";
+	
+	private final Shell shell = new Shell();
 
 	@GET
 	@Path("/api")
 	public String sayHello() {
 		java.nio.file.Path currentRelativePath = Paths.get("");
-		String s = currentRelativePath.toAbsolutePath().toString();
-		Shell shell = new Shell();
+		String currentPath = currentRelativePath.toAbsolutePath().toString();
 		String result = shell.executeCommand("sh ./src/main/resources/bin/abc.sh");
-		return "<h1>FSM Demo project" + s + "</h1>" + "<br/>" + "Your current dir is " + result;
+		
+		StringBuffer stringBuffer = new StringBuffer();
+		stringBuffer.append("<h1>FSM Demo project</h1>");
+		stringBuffer.append("<br/>");
+		stringBuffer.append("<b>Your current dir is :</b>");
+		stringBuffer.append("<i>" + currentPath + "</i>");
+		stringBuffer.append("<br/>");
+		stringBuffer.append(result);
+
+		return stringBuffer.toString();
 	}
 
 	@POST
