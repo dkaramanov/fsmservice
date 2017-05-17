@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="lib" path="src/main/resources/lib/antlr-4.4.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/lib/antlr-complete-4.4.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/lib/antlr-runtime-4.4.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/lib/commons-io-1.0.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/lib/easyfsm-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/lib/fsmxlator-0.1.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/lib/java-json-1.0.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/lib/JSONUtil-1.10.4.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/lib/log4j-1.2.8.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/lib/scribble-cli-1.0.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/lib/scribble-core-1.0.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/lib/scribble-parser-1.0.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/lib/stringtemplate-0.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/dell/.m2/repository/javax/javaee-api/7.0/javaee-api-7.0.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
+			<attribute name="maven.groupId" value="javax"/>
+			<attribute name="maven.artifactId" value="javaee-api"/>
+			<attribute name="maven.version" value="7.0"/>
+			<attribute name="maven.scope" value="provided"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

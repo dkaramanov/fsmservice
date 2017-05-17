@@ -1,0 +1,10 @@
+com\estafet\scribble\easyfsm\FSM\FSM.class
+com\estafet\scribble\easyfsm\States\FSMStateAction.class
+com\estafet\scribble\easyfsm\States\FSMState.class
+com\estafet\scribble\easyfsm\States\FSMTransitionInfo.class
+com\estafet\scribble\easyfsm\Action\FSMAction.class
+com\estafet\FSMApplication.class
+com\estafet\scribble\easyfsm\States\FSMStates.class
+com\estafet\Shell.class
+com\estafet\scribble\easyfsm\Common\CustomXMLReader.class
+com\estafet\FSMService.class
