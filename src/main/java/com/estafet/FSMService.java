@@ -56,13 +56,6 @@ public class FSMService {
 		System.out.println(command);
 		System.out.println(body);
 
-		java.nio.file.Path currentRelativePath = Paths.get("");
-		String s = currentRelativePath.toAbsolutePath().toString();
-		System.out.println("Current relative path is ::: " + s);
-
-		// Shell shell = new Shell();
-		// System.out.println(shell.executeCommand("ping -n 3 google.com"));
-
 		String result = fsmPost(command, body);
 		return Response.ok(result, MediaType.TEXT_PLAIN).build();
 	}
