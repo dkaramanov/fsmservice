@@ -53,7 +53,6 @@ public class FSMService {
 		stringBuffer.append("<i>" + currentPath + "</i>");
 		stringBuffer.append("<br/>");
 		stringBuffer.append(result);
-		
 
 		return stringBuffer.toString();
 	}
@@ -98,7 +97,7 @@ public class FSMService {
 
 		System.out.println("URI is <" + command + ">");
 		String[] p = extractParametersFrom(command, "____");
-		String event = p[0].substring(p[0].indexOf("=") + 1);
+		String event = getParameter(p, 0);
 		System.out.println("Event: " + event);
 
 		// System.out.println("data is <<<<<<<<<<<<\n" + data +
@@ -109,14 +108,14 @@ public class FSMService {
 		// "\n>>>>>>>>>>>");
 
 		if (event.startsWith("eppLoad")) {
-			String protocolName = p[1].substring(p[1].indexOf("=") + 1);
-			String roleName = p[2].substring(p[2].indexOf("=") + 1);
+			String protocolName = getParameter(p, 1);
+			String roleName = getParameter(p, 2);
 			String startState = null;
 			myrole = roleName;
 			// Extract the file name and load the behavior into the FSM
 			System.out.println("Loading easyFSM role from scribble");
 			if (p.length >= 4) {
-				startState = p[3].substring(p[3].indexOf("=") + 1);
+				startState = getParameter(p, 3);
 				System.out.println("Instantiating FSM for role '" + roleName + "' based on '" + protocolName
 						+ "' starting at '" + startState + "'");
 			} else
@@ -125,6 +124,7 @@ public class FSMService {
 			eppLoad(body, protocolName, roleName);
 			fsm = eppInstantiate(roleName);
 			String currentState = fsm.getCurrentState();
+			System.out.println("FSM current state " + currentState);
 			String nextStates[] = null;
 			nextStates = fsm.getValidCommands();
 			String availableToDo = "";
@@ -149,6 +149,13 @@ public class FSMService {
 		}
 
 		return payload;
+	}
+	
+	private String getParameter(String[] parameters, int index) {
+		if (index < parameters.length) {
+			return parameters[index].substring(parameters[index].indexOf("=") + 1);
+		}
+		return "";
 	}
 
 	private String eppLoad(String scribble, String protocol, String role) {
