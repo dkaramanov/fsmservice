@@ -56,8 +56,11 @@ public class FSMService {
 		StringBuffer stringBuffer = new StringBuffer();
 		if (result != null) {
 			String[] lines = result.split("\n");
+			if (lines.length >= 1) {
+				stringBuffer.append(lines[0]);
+			}
 			stringBuffer.append("<table border='0'>");
-			for(int i = 0; i < lines.length; i++) {
+			for(int i = 1; i < lines.length; i++) {
 				stringBuffer.append("<tr>");
 				String[] columns = lines[i].split(" ");
 				for (int j = 0; j < columns.length; j++) {
