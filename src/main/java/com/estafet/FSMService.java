@@ -39,7 +39,7 @@ public class FSMService {
 		String currentPath = currentRelativePath.toAbsolutePath().toString();
 		String result = shell.executeCommand("sh ./src/main/resources/bin/abc.sh");
 		
-		result = result.replaceAll("\n", "<br/>");
+		result = getAsAHTMLTable(result);
 		
 		StringBuffer stringBuffer = new StringBuffer();
 		stringBuffer.append("<h1>FSM Demo project</h1>");
@@ -49,6 +49,26 @@ public class FSMService {
 		stringBuffer.append("<br/>");
 		stringBuffer.append(result);
 
+		return stringBuffer.toString();
+	}
+
+	private String getAsAHTMLTable(String result) {
+		StringBuffer stringBuffer = new StringBuffer();
+		if (result != null) {
+			String[] lines = result.split("\n");
+			stringBuffer.append("<table border='0'>");
+			for(int i = 0; i < lines.length; i++) {
+				stringBuffer.append("<tr>");
+				String[] columns = lines[i].split(" ");
+				for (int j = 0; j < columns.length; j++) {
+					stringBuffer.append("<td>");
+					stringBuffer.append(columns[j]);
+					stringBuffer.append("</td>");
+				}
+				stringBuffer.append("</tr>");
+			}
+			stringBuffer.append("</table>");
+		}
 		return stringBuffer.toString();
 	}
 
