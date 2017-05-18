@@ -64,9 +64,11 @@ public class FSMService {
 				stringBuffer.append("<tr>");
 				String[] columns = lines[i].split(" ");
 				for (int j = 0; j < columns.length; j++) {
-					stringBuffer.append("<td>");
-					stringBuffer.append(columns[j]);
-					stringBuffer.append("</td>");
+					if (columns[j].trim().length() > 0) {
+						stringBuffer.append("<td>");
+						stringBuffer.append(columns[j].trim());
+						stringBuffer.append("</td>");
+					}
 				}
 				stringBuffer.append("</tr>");
 			}
