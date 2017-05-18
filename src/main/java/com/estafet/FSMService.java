@@ -1,6 +1,5 @@
 package com.estafet;
 
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,24 +21,30 @@ import com.estafet.scribble.easyfsm.FSM.FSM;
 
 @Path("/fsmserver")
 public class FSMService {
-
-	private FSM f;
-	private String myrole = "generic";
-	private final static String SCRIBBLEDIR = "/opt/app-root/src/src/main/resources"; 
-	private String location = SCRIBBLEDIR;
-	static String urlString = "/fsmserver/api";
-	static String payload = urlString + " response.";
 	
+	private final static String SCRIBBLEDIR = "/opt/app-root/src/src/main/resources"; 
+	private final static String location = SCRIBBLEDIR;
+	private final static String urlString = "/fsmserver/api";
+
 	private final Shell shell = new Shell();
+	
+	private FSM fsm;
+	private String myrole = "generic";
+	private String payload = urlString + " response.";
 
 	@GET
 	@Path("/api")
 	public String sayHello() {
 		java.nio.file.Path currentRelativePath = Paths.get("");
 		String currentPath = currentRelativePath.toAbsolutePath().toString();
-		String result = shell.executeCommand("sh ./src/main/resources/bin/abc.sh");
 		
-		result = getAsAHTMLTable(result);
+		String result;
+		try {
+			result = shell.executeCommand("sh ./src/main/resources/bin/abc.sh");
+			result = getAsHTMLTable(result);
+		} catch (ShellException se) {
+			result = "<b><font color='red'>Error has occurred</font></b><br/>" + se.getMessage();
+		}
 		
 		StringBuffer stringBuffer = new StringBuffer();
 		stringBuffer.append("<h1>FSM Demo project</h1>");
@@ -48,11 +53,12 @@ public class FSMService {
 		stringBuffer.append("<i>" + currentPath + "</i>");
 		stringBuffer.append("<br/>");
 		stringBuffer.append(result);
+		
 
 		return stringBuffer.toString();
 	}
 
-	private String getAsAHTMLTable(String result) {
+	private String getAsHTMLTable(String result) {
 		StringBuffer stringBuffer = new StringBuffer();
 		if (result != null) {
 			String[] lines = result.split("\n");
@@ -117,10 +123,10 @@ public class FSMService {
 				System.out.println("Instantiating FSM for role '" + roleName + "' based on '" + protocolName + "'");
 
 			eppLoad(body, protocolName, roleName);
-			f = eppInstantiate(roleName);
-			String currentState = f.getCurrentState();
+			fsm = eppInstantiate(roleName);
+			String currentState = fsm.getCurrentState();
 			String nextStates[] = null;
-			nextStates = f.getValidCommands();
+			nextStates = fsm.getValidCommands();
 			String availableToDo = "";
 			for (int i = 0; (i < nextStates.length); i++) {
 				availableToDo = availableToDo + "    <" + nextStates[i] + ">\n";
@@ -137,9 +143,9 @@ public class FSMService {
 			String message = command;
 			String m = message.substring(message.indexOf("____") + "____".length());
 			if (body != null)
-				payload = FSMExecute(f, m, body);
+				payload = FSMExecute(fsm, m, body);
 			else
-				payload = FSMExecute(f, m);
+				payload = FSMExecute(fsm, m);
 		}
 
 		return payload;
@@ -165,25 +171,38 @@ public class FSMService {
 		}
 		String scribbleFile = location + "/bin/generated/" + moduleName + ".scr";
 		// Save the scribble to icribb eFile
-		BufferedWriter writer = null;
 		PrintWriter out = null;
 		try {
 			out = new PrintWriter(new FileWriter(scribbleFile));
 			out.println(scribble);
-			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if (out != null) {
+				out.close();
+			}
 		}
+	
 		// Construct epp command
 		String command = "sh " + location + "/bin/epp.sh " + scribbleFile + " " + protocol + " " + role;
 		// String command = "c:/bash";
 
 		System.out.println("command <" + command + ">");
 
-		String output = shell.executeCommand(command);
+		String output;
+		try {
+			output = shell.executeCommand(command);
+		} catch (ShellException se) {
+			output = se.getMessage();
+		}
 
 		System.out.println("***\n" + output + "\n***");
-		output = shell.executeCommand("ls -ls " + location + "/bin/generated");
+		
+		try {
+			output = shell.executeCommand("ls -ls " + location + "/bin/generated");
+		} catch (ShellException se) {
+			output = se.getMessage();
+		}
 		System.out.println("***\n" + output + "\n***");
 
 		return location + "/bin/generated" + role + "_config.txt";
