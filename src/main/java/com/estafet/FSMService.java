@@ -3,7 +3,6 @@ package com.estafet;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.util.StringTokenizer;
@@ -25,6 +24,7 @@ public class FSMService {
 	private final static String SCRIBBLEDIR = "/opt/app-root/src/src/main/resources"; 
 	private final static String location = SCRIBBLEDIR;
 	private final static String urlString = "/fsmserver/api";
+	private final static String SCRIBBLE_DELIM = "____";
 
 	private final Shell shell = new Shell();
 	
@@ -92,34 +92,33 @@ public class FSMService {
 		return Response.ok(result, MediaType.TEXT_PLAIN).build();
 	}
 
-	public String fsmPost(String command, String body) {
+	private String fsmPost(String command, String body) {
 		System.out.println("\n------- GOT REQUEST METHOD: " +  "-------");
 
 		System.out.println("URI is <" + command + ">");
-		String[] p = extractParametersFrom(command, "____");
+		String[] p = extractParametersFrom(command, SCRIBBLE_DELIM);
 		String event = getParameter(p, 0);
 		System.out.println("Event: " + event);
 
-		// System.out.println("data is <<<<<<<<<<<<\n" + data +
-		// "\n<<<<<<<<<<<<<");
-		if (body != null)
+		if (body != null) {
 			body = body.replaceAll("xxxx", "\n");
-		// System.out.println("data is >>>>>>>>>>>>\n" + data +
-		// "\n>>>>>>>>>>>");
+		}
 
 		if (event.startsWith("eppLoad")) {
 			String protocolName = getParameter(p, 1);
 			String roleName = getParameter(p, 2);
 			String startState = null;
 			myrole = roleName;
+			
 			// Extract the file name and load the behavior into the FSM
 			System.out.println("Loading easyFSM role from scribble");
 			if (p.length >= 4) {
 				startState = getParameter(p, 3);
 				System.out.println("Instantiating FSM for role '" + roleName + "' based on '" + protocolName
 						+ "' starting at '" + startState + "'");
-			} else
+			} else {
 				System.out.println("Instantiating FSM for role '" + roleName + "' based on '" + protocolName + "'");
+			}
 
 			eppLoad(body, protocolName, roleName);
 			fsm = eppInstantiate(roleName);
@@ -141,11 +140,8 @@ public class FSMService {
 			System.out.println(
 					"Trying to execute as an FSM in the role of " + myrole + " with the message <" + command + ">");
 			String message = command;
-			String m = message.substring(message.indexOf("____") + "____".length());
-			if (body != null)
-				payload = FSMExecute(fsm, m, body);
-			else
-				payload = FSMExecute(fsm, m);
+			String m = message.substring(message.indexOf(SCRIBBLE_DELIM) + SCRIBBLE_DELIM.length());
+			payload = body == null ? FSMExecute(fsm, m) : FSMExecute(fsm, m, body);
 		}
 
 		return payload;
@@ -192,8 +188,6 @@ public class FSMService {
 	
 		// Construct epp command
 		String command = "sh " + location + "/bin/epp.sh " + scribbleFile + " " + protocol + " " + role;
-		// String command = "c:/bash";
-
 		System.out.println("command <" + command + ">");
 
 		String output;
@@ -263,7 +257,7 @@ public class FSMService {
 			} catch (org.json.JSONException e3) {
 				// System.out.println("no parameters");
 			}
-			tmpmsg = tmpmsg.replaceAll("____", tmp);
+			tmpmsg = tmpmsg.replaceAll(SCRIBBLE_DELIM, tmp);
 			System.out.println("xsposed msg is <" + tmpmsg + ">");
 
 			String currentState = f.getCurrentState();
@@ -341,23 +335,18 @@ public class FSMService {
 		// 1. Open file <role>_config.txt
 		// 2. conduct start up of FSM
 		// 3. run FSM in modified runloop of httpserver
-		InputStream inputS = null;
-		FileInputStream m_fileReader = null;
 		try {
-
-			m_fileReader = new FileInputStream(config);
-			inputS = m_fileReader;
-			if (m_fileReader != null)
+			FileInputStream inputStream = new FileInputStream(config);
+			if (inputStream != null)
 				System.out.println("Got file " + config);
-			FSM f = new FSM(inputS, null);
-			String currentState = f.getCurrentState();
+			FSM fsm = new FSM(inputStream, null);
+			String currentState = fsm.getCurrentState();
 			System.out.println("FSM Instantiating for role " + roleName + ": current state is: <" + currentState + ">");
-			String nextStates[] = null;
-			nextStates = f.getValidCommands();
+			String nextStates[] = fsm.getValidCommands();
 			for (int i = 0; (i < nextStates.length); i++) {
 				System.out.println("nextstate[" + i + "]: <" + nextStates[i] + ">");
 			}
-			return f;
+			return fsm;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
