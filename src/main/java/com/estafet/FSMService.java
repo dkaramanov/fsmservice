@@ -112,13 +112,13 @@ public class FSMService {
 			
 			// Extract the file name and load the behavior into the FSM
 			System.out.println("Loading easyFSM role from scribble");
+			
+			String logMessage = "Instantiating FSM for role '" + roleName + "' based on '" + protocolName + "'";
 			if (p.length >= 4) {
 				startState = getParameter(p, 3);
-				System.out.println("Instantiating FSM for role '" + roleName + "' based on '" + protocolName
-						+ "' starting at '" + startState + "'");
-			} else {
-				System.out.println("Instantiating FSM for role '" + roleName + "' based on '" + protocolName + "'");
+				logMessage += " starting at '" + startState + "'";
 			}
+			System.out.println(logMessage);
 
 			eppLoad(body, protocolName, roleName);
 			fsm = eppInstantiate(roleName);
