@@ -98,8 +98,8 @@ public class FSMService {
 
 	private String fsmPost(String command, String body) throws FSMException {
 		System.out.println("\n------- GOT REQUEST METHOD: " +  "-------");
-
 		System.out.println("URI is <" + command + ">");
+		
 		String[] p = extractParametersFrom(command, SCRIBBLE_DELIM);
 		String event = getParameter(p, 0);
 		System.out.println("Event: " + event);
