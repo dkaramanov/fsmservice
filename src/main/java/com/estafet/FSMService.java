@@ -22,15 +22,15 @@ import com.estafet.scribble.easyfsm.FSM.FSM;
 public class FSMService {
 	
 	private final static String SCRIBBLEDIR = "/opt/app-root/src/src/main/resources"; 
-	private final static String location = SCRIBBLEDIR;
-	private final static String urlString = "/fsmserver/api";
+	private final static String LOCATION = SCRIBBLEDIR;
+	private final static String URL = "/fsmserver/api";
 	private final static String SCRIBBLE_DELIM = "____";
 
 	private final Shell shell = new Shell();
 	
 	private FSM fsm;
 	private String myrole = "generic";
-	private String payload = urlString + " response.";
+	private String payload = URL + " response.";
 
 	@GET
 	@Path("/api")
@@ -87,12 +87,16 @@ public class FSMService {
 	public Response postString(@PathParam("command") final String command, String body) {
 		System.out.println(command);
 		System.out.println(body);
-
-		String result = fsmPost(command, body);
-		return Response.ok(result, MediaType.TEXT_PLAIN).build();
+		
+		try {
+			String result = fsmPost(command, body);
+			return Response.ok(result, MediaType.TEXT_PLAIN).build();
+		} catch (FSMException e) {
+			return Response.serverError().entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
+		}
 	}
 
-	private String fsmPost(String command, String body) {
+	private String fsmPost(String command, String body) throws FSMException {
 		System.out.println("\n------- GOT REQUEST METHOD: " +  "-------");
 
 		System.out.println("URI is <" + command + ">");
@@ -131,7 +135,7 @@ public class FSMService {
 				availableToDo = availableToDo + "    <" + nextStates[i] + ">\n";
 			}
 			System.out.println("Accepting:\n" + availableToDo);
-			payload = "Instantiated FSM for role '" + roleName + "' based on '" + protocolName + "' for " + urlString + "\nAccepting:\n" + availableToDo;
+			payload = "Instantiated FSM for role '" + roleName + "' based on '" + protocolName + "' for " + URL + "\nAccepting:\n" + availableToDo;
 			// Should be two/three parameters, one is the scribble and the other
 			// is the role name to play
 			// and the third (optional) is the starting state
@@ -172,7 +176,7 @@ public class FSMService {
 				break;
 			}
 		}
-		String scribbleFile = location + "/bin/generated/" + moduleName + ".scr";
+		String scribbleFile = LOCATION + "/bin/generated/" + moduleName + ".scr";
 		// Save the scribble to icribb eFile
 		PrintWriter out = null;
 		try {
@@ -187,7 +191,7 @@ public class FSMService {
 		}
 	
 		// Construct epp command
-		String command = "sh " + location + "/bin/epp.sh " + scribbleFile + " " + protocol + " " + role;
+		String command = "sh " + LOCATION + "/bin/epp.sh " + scribbleFile + " " + protocol + " " + role;
 		System.out.println("command <" + command + ">");
 
 		String output;
@@ -200,13 +204,13 @@ public class FSMService {
 		System.out.println("***\n" + output + "\n***");
 		
 		try {
-			output = shell.executeCommand("ls -ls " + location + "/bin/generated");
+			output = shell.executeCommand("ls -ls " + LOCATION + "/bin/generated");
 		} catch (ShellException se) {
 			output = se.getMessage();
 		}
 		System.out.println("***\n" + output + "\n***");
 
-		return location + "/bin/generated" + role + "_config.txt";
+		return LOCATION + "/bin/generated" + role + "_config.txt";
 	}
 
 	private String[] extractParametersFrom(String uri, String delim) {
@@ -221,8 +225,7 @@ public class FSMService {
 		return parameters;
 	}
 
-	private String FSMExecute(FSM f, String msg, String data) {
-		String retval = "";
+	private String FSMExecute(FSM f, String msg, String data) throws FSMException {
 		String availableToDo = "";
 		String tmpmsg = msg;
 
@@ -287,13 +290,11 @@ public class FSMService {
 			}
 			return "Valid next states from " + currentState + " are:\n" + availableToDo;
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new FSMException(e.getMessage());
 		}
-		return retval;
 	}
 
-	private String FSMExecute(FSM f, String msg) {
-		String retval = "";
+	private String FSMExecute(FSM f, String msg) throws FSMException {
 		String availableToDo = "";
 		String tmpmsg = msg;
 
@@ -325,13 +326,12 @@ public class FSMService {
 			}
 			return "Valid next states from " + currentState + " are:\n" + availableToDo;
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new FSMException(e.getMessage());
 		}
-		return retval;
 	}
 
-	private FSM eppInstantiate(String roleName) {
-		String config = location + "/bin/generated/" + roleName + "_config.txt";
+	private FSM eppInstantiate(String roleName) throws FSMException {
+		String config = LOCATION + "/bin/generated/" + roleName + "_config.txt";
 		// 1. Open file <role>_config.txt
 		// 2. conduct start up of FSM
 		// 3. run FSM in modified runloop of httpserver
@@ -348,8 +348,7 @@ public class FSMService {
 			}
 			return fsm;
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new FSMException(e.getMessage());
 		}
-		return null;
 	}
 }
