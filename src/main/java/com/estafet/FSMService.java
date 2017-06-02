@@ -47,7 +47,7 @@ public class FSMService {
 		}
 		
 		StringBuffer stringBuffer = new StringBuffer();
-		stringBuffer.append("<h1>FSM Demo project</h1>");
+		stringBuffer.append("<h1>FSM Service project</h1>");
 		stringBuffer.append("<br/>");
 		stringBuffer.append("<b>Your current dir is :</b>");
 		stringBuffer.append("<i>" + currentPath + "</i>");
